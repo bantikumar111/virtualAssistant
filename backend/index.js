@@ -12,7 +12,7 @@ import geminiResponse from "./gemini.js"
 const app= express()
 
 app.use(cors({
-  origin:"http://localhost:5173",  //allow this url , whoever will come from this url  we'll allow 
+  origin:"https://virtualassistant-frontend-upq7.onrender.com",  //allow this url , whoever will come from this url  we'll allow 
   credentials:true
 }
 ))
