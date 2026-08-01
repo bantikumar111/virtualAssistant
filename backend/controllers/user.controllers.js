@@ -17,28 +17,62 @@ export const getCurrentUser= async (req, res)=>{
     return res.status(400).json({message:"get current user err"})
   }
 } 
-
-export const updateAssistant = async(req, res)=>{
+export const updateAssistant = async (req, res) => {
   try {
-    const {assistantName, imageUrl} =req.body
-    let assistantImage;
-    //check if img is coming from input then store on cloudinary
-    if(req.file){
-      assistantImage= await uploadOnCloudinary(req.file.path)
+    const { assistantName, imageUrl } = req.body;
+
+    // 1. Image URL handle karo (File upload hui hai ya Cloudinary/Pre-defined asset)
+    let finalImage = imageUrl;
+    if (req.file) {
+      finalImage = req.file.path; // Agar Multer + Cloudinary set hai
     }
-    //img is from given 7 imges
-    else{
-      assistantImage=imageUrl
+
+    // 2. Validation Check
+    if (!assistantName) {
+      return res.status(400).json({ message: "Assistant name is required" });
     }
-    const user= await User.findByIdAndUpdate(req.userId,{
-      assistantName, assistantImage
-    },{new:true}).select("-password")
-    
-    return res.status(200).json(user)
+
+    // 3. User update logic (req.user._id isAuth middleware se aa raha hai)
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        assistantName: assistantName,
+        assistantImage: finalImage,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(updatedUser);
   } catch (error) {
-    return res.status(400).json({message:"updateAssistant user err"})
+    console.error("Error in updateAssistant:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
-}
+};
+// export const updateAssistant = async(req, res)=>{
+//   try {
+//     const {assistantName, imageUrl} =req.body
+//     let assistantImage;
+//     //check if img is coming from input then store on cloudinary
+//     if(req.file){
+//       assistantImage= await uploadOnCloudinary(req.file.path)
+//     }
+//     //img is from given 7 imges
+//     else{
+//       assistantImage=imageUrl
+//     }
+//     const user= await User.findByIdAndUpdate(req.userId,{
+//       assistantName, assistantImage
+//     },{new:true}).select("-password")
+    
+//     return res.status(200).json(user)
+//   } catch (error) {
+//     return res.status(400).json({message:"updateAssistant user err"})
+//   }
+// }
 
 export const askToAssistant = async(req, res)=>{
   try {

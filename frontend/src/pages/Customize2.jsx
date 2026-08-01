@@ -25,28 +25,65 @@ function Customize2() {
 
   const imagePreview = getImagePreview();
 
-  const handleUpdateAssistant = async () => {
-    if (!assistantName.trim()) return;
-    setLoading(true)
-    try {
-      let formData = new FormData()
-      formData.append("assistantName", assistantName)
-      if (backendImage) {
-        formData.append("assistantImage", backendImage)
-      } else {
-        formData.append("imageUrl", selectedImage)
-      }
-      const result = await axios.post(`${serverUrl}/api/user/update`, formData, { withCredentials: true })
-      console.log(result.data)
-      setUserData(result.data)
-      setLoading(false)
-      navigate("/")
-    } catch (error) {
-      setLoading(false)
-      console.log(error)
-    }
-  }
+  // const handleUpdateAssistant = async () => {
+  //   if (!assistantName.trim()) return;
+  //   setLoading(true)
+  //   try {
+  //     let formData = new FormData()
+  //     formData.append("assistantName", assistantName)
+  //     if (backendImage) {
+  //       formData.append("assistantImage", backendImage)
+  //     } else {
+  //       formData.append("imageUrl", selectedImage)
+  //     }
+  //     const result = await axios.post(`${serverUrl}/api/user/update`, formData, { withCredentials: true })
+  //     console.log(result.data)
+  //     setUserData(result.data)
+  //     setLoading(false)
+  //     navigate("/")
+  //   } catch (error) {
+  //     setLoading(false)
+  //     console.log(error)
+  //   }
+  // }
+const handleUpdateAssistant = async () => {
+  if (!assistantName.trim()) return;
+  setLoading(true);
 
+  try {
+    let payload;
+    let headers = {};
+
+    if (backendImage) {
+      // Jab actual file upload ho rahi ho
+      payload = new FormData();
+      payload.append("assistantName", assistantName);
+      payload.append("assistantImage", backendImage); // File
+      // Express auto boundary set karega
+    } else {
+      // Jab pre-defined image asset URL select kiya ho
+      payload = {
+        assistantName: assistantName,
+        imageUrl: selectedImage
+      };
+      headers["Content-Type"] = "application/json";
+    }
+
+    const result = await axios.post(`${serverUrl}/api/user/update`, payload, {
+      withCredentials: true,
+      headers: headers
+    });
+
+    console.log("Success:", result.data);
+    setUserData(result.data);
+    setLoading(false);
+    navigate("/");
+
+  } catch (error) {
+    setLoading(false);
+    console.error("Update Error:", error.response?.data || error.message);
+  }
+};
   return (
     <div className='w-full min-h-screen bg-gradient-to-b from-[#03031e] via-[#01012b] to-[#00000a] flex justify-center items-center flex-col p-4 sm:p-6 relative overflow-hidden select-none'>
       
