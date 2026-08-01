@@ -17,7 +17,7 @@ function SignIn () {
   const [password, setPassword] = useState("")
   const [err, setErr] = useState("")
 
-  const handleSignIn = async (e) => {
+ const handleSignIn = async (e) => {
     e.preventDefault()
     setErr("")
     setLoading(true)
@@ -25,7 +25,15 @@ function SignIn () {
       let result = await axios.post(`${serverUrl}/api/auth/signin`, {
         email, password
       }, { withCredentials: true })
-      setUserData(result.data)
+
+      // 🔑 CRITICAL FIX: LocalStorage mein token save karo!
+      if (result.data.token) {
+        localStorage.setItem("token", result.data.token)
+      } else if (result.data.user?.token) {
+        localStorage.setItem("token", result.data.user.token)
+      }
+
+      setUserData(result.data.user || result.data)
       setLoading(false)
       navigate("/")
     } catch (err) {

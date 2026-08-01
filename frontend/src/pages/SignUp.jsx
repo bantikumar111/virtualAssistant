@@ -23,10 +23,17 @@ function SignUp () {
     setErr("")
     setLoading(true)
     try {
-      let result = await axios.post(`${serverUrl}/api/auth/signup`, {       
+      let result = await axios.post(`${serverUrl}/api/auth/signup`, {      
         name, email, password
       }, { withCredentials: true }) 
-      setUserData(result.data)
+
+      // 🔑 LocalStorage Token Save
+      const token = result.data?.token || result.data?.user?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      setUserData(result.data?.user || result.data)
       setLoading(false)
       navigate("/customize")
     } catch (err) {
@@ -42,15 +49,12 @@ function SignUp () {
       className='w-full min-h-screen bg-cover bg-center flex justify-center items-center p-4 relative overflow-hidden'
       style={{ backgroundImage: `url(${bg})` }}
     >
-      {/* Subtle overlay layer for depth */}
       <div className='absolute inset-0 bg-black/40 backdrop-blur-sm'></div>
 
-      {/* Glassmorphism Card */}
       <form 
         className='relative z-10 w-full max-w-[460px] bg-black/40 backdrop-blur-md border border-white/20 shadow-2xl shadow-black/80 rounded-3xl flex flex-col items-center justify-center p-8 sm:p-10 transition-all' 
         onSubmit={handleSignUp}
       >
-        {/* Header */}
         <div className='text-center mb-8'>
           <h1 className='text-white text-2xl sm:text-3xl font-bold tracking-tight'>
             Create Account ✨
@@ -60,9 +64,7 @@ function SignUp () {
           </p>
         </div>
 
-        {/* Input Container */}
         <div className='w-full flex flex-col gap-4'>
-          {/* Name Field */}
           <div className='relative w-full'>
             <MdPerson className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl' />
             <input 
@@ -75,7 +77,6 @@ function SignUp () {
             />
           </div>
 
-          {/* Email Field */}
           <div className='relative w-full'>
             <MdEmail className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl' />
             <input 
@@ -88,7 +89,6 @@ function SignUp () {
             />
           </div>
 
-          {/* Password Field */}
           <div className='relative w-full'>
             <MdLock className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl' />
             <input 
@@ -99,7 +99,6 @@ function SignUp () {
               onChange={(e) => setPassword(e.target.value)} 
               value={password}
             />
-            {/* Toggle Password Icon */}
             <button
               type="button"
               className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white transition-colors cursor-pointer'
@@ -110,14 +109,12 @@ function SignUp () {
           </div>
         </div>
 
-        {/* Error Message Display */}
         {err && (
           <div className='w-full bg-red-500/20 border border-red-500/50 text-red-300 text-sm py-2 px-4 rounded-xl mt-4 text-center animate-shake'>
             {err}
           </div>
         )}
 
-        {/* Submit Button */}
         <button 
           type="submit"
           className='w-full h-[54px] text-black font-semibold bg-gradient-to-r from-white via-blue-100 to-blue-200 hover:from-blue-200 hover:to-white rounded-2xl text-lg mt-8 shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex justify-center items-center cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed' 
@@ -130,7 +127,6 @@ function SignUp () {
           )}
         </button>
 
-        {/* Signin Redirect */}
         <p className='mt-6 text-gray-300 text-sm text-center'>
           Already have an account?{' '}
           <span 
@@ -146,5 +142,3 @@ function SignUp () {
 }
 
 export default SignUp
-
-
