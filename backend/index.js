@@ -8,14 +8,26 @@ import cookieParser from "cookie-parser"
 import userRouter from "./routes/user.routes.js"
 import geminiResponse from "./gemini.js"
 
+// Add allowed origins array
+const allowedOrigins = [
+  //"http://localhost:5173",
+  "https://virtualassistant-frontend-upq7.onrender.com" // Your deployed frontend
+];
+
 
 const app= express()
 // ...existing code...
 app.use(cors({
-  origin:"http://localhost:5173",  //allow this url , whoever will come from this url  we'll allow 
-  credentials:true
-}
-))
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 const port=process.env.PORT || 5000
 
 
