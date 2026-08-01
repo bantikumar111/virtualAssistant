@@ -63,11 +63,11 @@ function SignIn () {
       *{err}
       </p>}
 
-      <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[19px] mt-[30px]' disabled={loading}>{loading? "loadin...":"LogIn"}</button>
+      <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[19px] mt-[30px]' disabled={loading}>{loading? "loading..":"LogIn"}</button>
 
       <p className='mt-[20px] text-[white] text-[18px] cursor-pointer' onClick={()=>navigate("/signup")}>Want to create a new account ? <span className='text-blue-400'>Sign Up</span></p>
       </form>
-    </div>
+    </div>  
   )
 }
 

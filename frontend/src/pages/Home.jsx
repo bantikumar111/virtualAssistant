@@ -18,10 +18,10 @@ function Home  (){
   const [listening, setListening]=useState(false)
   const [userText, setUserText]= useState("") //user txt to display on ui
   const [aiText, setAiText]= useState("") //ai txt to display on ui
-  const isSpeakingRef= useRef(false)
-  const recognitionRef= useRef(null)
+  const isSpeakingRef= useRef(false) //ai is speaking
+  const recognitionRef= useRef(null)// store speech recogintion
   const [ham, setHam]=useState(false)  //hamburger icon(menu)
-  const isRecognizingRef= useRef(false)//
+  const isRecognizingRef= useRef(false)//Tracks if recognition is active.
   const synth= window.speechSynthesis
 
 
@@ -37,12 +37,12 @@ function Home  (){
   }
 
   const startRecognition=()=>{
-    if(!isSpeakingRef.current && !isRecognizingRef.current){
+    if(!isSpeakingRef.current && !isRecognizingRef.current){ //Starts speech recognition only if AI is not speaking and recognition is not already active
       try {
         recognitionRef.current?.start()
         console.log("Recognition requested to start")
       } catch (error) {
-        if(!error.namedes !=="InvalidStateError"){
+        if(!error.name !=="InvalidStateError"){
           console.error("Start error:", error)
         }
       }
@@ -55,19 +55,19 @@ function Home  (){
     const utterence = new SpeechSynthesisUtterance(text)
     utterence.lang='hi-IN'
     const voices= window.speechSynthesis.getVoices()
-  const hindiVoice= voices.find(v=> v.lang === 'hi-IN');
-  if(hindiVoice){
-    utterence.voice= hindiVoice;
-  }
+    const hindiVoice= voices.find(v=> v.lang === 'hi-IN');
+    if(hindiVoice){
+      utterence.voice= hindiVoice;
+    }
 
 
-    isSpeakingRef.current=true //when user starts speaking
+    isSpeakingRef.current=true //when ai starts speaking
     utterence.onend=()=>{
       setAiText("")
-      isSpeakingRef.current=false //when user stops speaking
+      isSpeakingRef.current=false //when ai stops speaking
       setTimeout(() => {
         startRecognition(); //delay se race condition avoid hoti hai
-      }, 800);
+      }, 2500);
     }
     synth.cancel(); //pahle se koi speech ho to band kro
     synth.speak(utterence)
@@ -112,7 +112,7 @@ useEffect(()=>{
   recognitionRef.current=recognition
 
   //const isRecognizingRef= {current:false}//
-  let isMounted = true; // 🔑 Added flag to avoid setState on unmounted component
+  let isMounted = true; // Added flag to avoid setState on unmounted component
 
   //start recongnition after 1 sec delay only if component still mounted
   const startTimeout= setTimeout(() =>{
@@ -138,9 +138,9 @@ useEffect(()=>{
     isRecognizingRef.current=false;
     setListening(false);
 
-    if(!isRecognizingRef.current && !isMounted){
+    if(isMounted && !isSpeakingRef.current){
       setTimeout(() => {
-        if(isMounted){
+        if(isMounted && !isSpeakingRef.current){
           try {
             recognition.start();
             console.log("Recognition restarted")
@@ -210,49 +210,47 @@ window.speechSynthesis.speak(greeting)
 
 
 //window.speechSynthesis.speak(new SpeechSynthesisUtterance("Hello world"))
-  return (
-    <div className='w-full h-[100vh] bg-gradient-to-t from-[black] to-[#0a0a68] flex justify-center items-center flex-col gap-[20px] overflow-hidden' >
+return (
+  <div className='w-full min-h-screen bg-gradient-to-t from-black to-[#0a0a68] flex justify-center items-center flex-col gap-5 overflow-hidden px-4 relative'>
 
-    <HiMenuAlt3  className='lg:hidden text-white absolute top-[20px] right-[20px] w-[25px] h-[25px]' onClick={()=>setHam(true)}/>
+    {/* Hamburger Menu */}
+    <HiMenuAlt3 className='lg:hidden text-white absolute top-5 right-5 w-7 h-7 cursor-pointer' onClick={() => setHam(true)} />
 
-    <div className={`absolute lg:hidden top-0 w-full h-full bg-[#00000053] backdrop-blur-lg p-[20px] flex flex-col gap-[20px] items-start ${ham?"translate-x-0":"translate-x-full"} transition-transform`}>
-    <RxCross2 className=' text-white absolute top-[20px] right-[20px] w-[25px] h-[25px]' onClick={()=>setHam(false)}/>
+    {/* Mobile Sidebar */}
+    <div className={`absolute lg:hidden top-0 left-0 w-full h-full bg-[#00000053] backdrop-blur-lg p-5 flex flex-col gap-5 items-center ${ham ? "translate-x-0" : "translate-x-full"} transition-transform duration-300`}>
+  <RxCross2 className="text-white absolute top-5 right-5 w-7 h-7 cursor-pointer" onClick={() => setHam(false)} />
 
-       <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[19px]   cursor-pointer' onClick={handleLogOut}>Log Out</button>
+  <button className="w-[80%] max-w-[250px] h-14 text-black font-semibold bg-white rounded-full text-lg cursor-pointer" onClick={handleLogOut}>
+    Log Out
+  </button>
 
-        <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white  rounded-full text-[19px] px-[20px] cursor-pointer' onClick={()=>navigate("/customize")}>Customize your Assistant</button>
+  <button className="w-[80%] max-w-[250px] h-14 text-black font-semibold bg-white rounded-full text-lg px-5 cursor-pointer" onClick={() => navigate("/customize")}>
+    Customize your Assistant
+  </button>
 
-       <div className="text-white w-full mt-4">
-      <h3 className="font-semibold mb-2">History</h3>
-    <div className="flex flex-col gap-3 overflow-y-auto max-h-[700px]  p-3 rounded-lg">
-    {userData.history && userData.history.length > 0 ? (
-      userData.history.map((his, index) => (
-        <span key={index} className="text-semibold text-white/90">{his}</span>
-      ))
-    ) : (
-      <span className="text-gray-400 text-sm">No history yet</span>
-    )}
-  </div>
+
 </div>
 
+
+    {/* Desktop Buttons */}
+    <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[16px] mt-5 absolute hidden lg:block top-5 right-5 cursor-pointer' onClick={handleLogOut}>Log Out</button>
+    <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[16px] mt-5 absolute hidden lg:block top-[100px] right-5 px-5 cursor-pointer' onClick={() => navigate("/customize")}>Customize your Assistant</button>
+
+    {/* Assistant Image */}
+    <div className='w-[250px] sm:w-[280px] md:w-[300px] h-[350px] sm:h-[380px] md:h-[400px] flex justify-center items-center overflow-hidden rounded-2xl shadow-lg'>
+      <img src={userData?.assistantImage} alt="" className='h-full object-cover w-full' />
     </div>
 
-       <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[19px] mt-[30px] absolute hidden lg:block top-[20px] right-[20px] cursor-pointer' onClick={handleLogOut}>Log Out</button>
-        <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white  rounded-full text-[19px] mt-[30px] absolute hidden lg:block top-[100px] right-[20px] px-[20px] cursor-pointer' onClick={()=>navigate("/customize")}>Customize your Assistant</button>
-      
-      
-      <div className='w-[300px] h-[400px] flex justify-center items-center overflow-hidden rounded-4xl shadow-lg'>
+    <h1 className='text-white text-lg sm:text-xl font-semibold text-center mt-2'>I'm {userData?.assistantName}</h1>
 
-      <img src={userData?.assistantImage} alt="" className='h-full object-cover'/>
-      </div>
-      <h1 className='text-white text-[18px] font-semibold'>I'm {userData?.assistantName}</h1>
+    {!aiText && <img src={userImg} alt="" className='w-[150px] sm:w-[200px]' />}
+    {aiText && <img src={aiImg} alt="" className='w-[150px] sm:w-[200px]' />}
 
-      {!aiText  && <img src={userImg} alt="" className='w-[200px]'/>}
-      {aiText && <img src={aiImg} alt=""  className='w-[200px]'/> }
-
-      <h1 className='text-white text-[18px] font-semibold text-wrap'>{userText? userText: aiText?aiText:null}</h1>
-    </div>
-  )
+    <h1 className='text-white text-base sm:text-lg font-semibold text-center px-2 break-words'>
+      {userText ? userText : aiText ? aiText : null}
+    </h1>
+  </div>
+);
 }
 
 export default Home

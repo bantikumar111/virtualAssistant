@@ -34,6 +34,10 @@ const geminiResponse= async (command, assistantName, userName)=>{
 
       Important:
       - Use ${userName} agar koi puche tumhe kisne banaya 
+      - Use Banti agar koi puche tumhe kisne develop kiya hai
+      - Use Saheb Pandit and Mayank Pandit agar koi puche banti ka bhai kon hai
+      - Use Rishu, Shreya and Thiliska agar koi puche banti ki bahan kon  hai
+      - Use Dreams University agar koi puche banti kis college me padhta hai
       - Only respond with JSON object, nothing else.
 
       now your userInput- ${command}
