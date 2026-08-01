@@ -20,31 +20,27 @@ export const getCurrentUser= async (req, res)=>{
 export const updateAssistant = async (req, res) => {
   try {
     const { assistantName, imageUrl } = req.body;
+    
+    // User ID check (dono cases handle karega)
+    const userId = req.user?._id || req.userId;
 
-    // 1. Image URL handle karo (File upload hui hai ya Cloudinary/Pre-defined asset)
+    if (!userId) {
+      return res.status(401).json({ message: "User identity not found in request" });
+    }
+
     let finalImage = imageUrl;
     if (req.file) {
-      finalImage = req.file.path; // Agar Multer + Cloudinary set hai
+      finalImage = req.file.path;
     }
 
-    // 2. Validation Check
-    if (!assistantName) {
-      return res.status(400).json({ message: "Assistant name is required" });
-    }
-
-    // 3. User update logic (req.user._id isAuth middleware se aa raha hai)
     const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
+      userId, // 👈 Safe User ID
       {
         assistantName: assistantName,
         assistantImage: finalImage,
       },
       { new: true }
     );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
     return res.status(200).json(updatedUser);
   } catch (error) {
