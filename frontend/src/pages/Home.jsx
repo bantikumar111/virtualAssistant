@@ -210,8 +210,8 @@ window.speechSynthesis.speak(greeting)
 
 
 //window.speechSynthesis.speak(new SpeechSynthesisUtterance("Hello world"))
-return (
-  <div className='w-full min-h-screen bg-gradient-to-t from-black to-[#0a0a68] flex justify-center items-center flex-col gap-5 overflow-hidden px-4 relative'>
+  return (
+    <div className='w-full h-[100vh] bg-gradient-to-t from-[black] to-[#0a0a68] flex justify-center items-center flex-col gap-[20px] overflow-hidden' >
 
     {/* Hamburger Menu */}
     <HiMenuAlt3 className='lg:hidden text-white absolute top-5 right-5 w-7 h-7 cursor-pointer' onClick={() => setHam(true)} />
@@ -224,21 +224,21 @@ return (
     Log Out
   </button>
 
-  <button className="w-[80%] max-w-[250px] h-14 text-black font-semibold bg-white rounded-full text-lg px-5 cursor-pointer" onClick={() => navigate("/customize")}>
-    Customize your Assistant
-  </button>
+        <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white  rounded-full text-[19px] px-[20px] cursor-pointer' onClick={()=>navigate("/customize")}>Customize your Assistant</button>
 
-
+       <div className="text-white w-full mt-4">
+      <h3 className="font-semibold mb-2">History</h3>
+    <div className="flex flex-col gap-3 overflow-y-auto max-h-[700px]  p-3 rounded-lg">
+    {userData.history && userData.history.length > 0 ? (
+      userData.history.map((his, index) => (
+        <span key={index} className="text-semibold text-white/90">{his}</span>
+      ))
+    ) : (
+      <span className="text-gray-400 text-sm">No history yet</span>
+    )}
+  </div>
 </div>
 
-
-    {/* Desktop Buttons */}
-    <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[16px] mt-5 absolute hidden lg:block top-5 right-5 cursor-pointer' onClick={handleLogOut}>Log Out</button>
-    <button className='min-w-[150px] h-[60px] text-black font-semibold bg-white rounded-full text-[16px] mt-5 absolute hidden lg:block top-[100px] right-5 px-5 cursor-pointer' onClick={() => navigate("/customize")}>Customize your Assistant</button>
-
-    {/* Assistant Image */}
-    <div className='w-[250px] sm:w-[280px] md:w-[300px] h-[350px] sm:h-[380px] md:h-[400px] flex justify-center items-center overflow-hidden rounded-2xl shadow-lg'>
-      <img src={userData?.assistantImage} alt="" className='h-full object-cover w-full' />
     </div>
 
     <h1 className='text-white text-lg sm:text-xl font-semibold text-center mt-2'>I'm {userData?.assistantName}</h1>
